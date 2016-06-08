@@ -1,6 +1,7 @@
 // NEW
 'use strict';
 let fs = require('fs-extra');
+require('express-force-ssl');
 
 let env  = process.env.NODE_ENV;
 // Ensure we're in the project directory, so relative paths work as expected
@@ -31,6 +32,15 @@ app.use(cors());
 // use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+if(env === 'production') {
+  app.set('forceSSLOptions', {
+    enable301Redirects: true,
+    trustXFPHeader: false,
+    httpsPort: 443,
+    sslRequiredMessage: 'SSL Required.',
+  });
+}
 
 if(env === 'development') {
   // Log requests to the console

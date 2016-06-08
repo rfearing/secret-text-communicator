@@ -3,6 +3,8 @@ This app is built for sharing passwords or secret content with clients in a more
 
 This is made for the free heroku tier since they automatically shut off after 30 minutes of inactivity, in effect, stopping the node process and clearing all saved passwords.
 
+Obviously you should use SSL.
+
 ###Getting started
 3. Deploy to heroku.
 4. Visit your app at the Heroku URL.

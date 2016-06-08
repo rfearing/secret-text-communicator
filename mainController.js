@@ -11,7 +11,15 @@ module.exports.create = (req, res) => {
   return require('crypto').randomBytes(48, (err, buffer) => {
     let token = buffer.toString('hex');
     passwords[token] = req.body.message;
-    return res.send(`You can share your secret with this link (It will only work once):<br/>${req.protocol}://${req.get('host')}/${token}<br/><br/> The link is only guaranteed for 30 minutes.<br/><br/><a href="/">Go home</a>`);
+
+    let protocol;
+    if(req.connection.encrypted) {
+      protocol = 'https';
+    } else {
+      protocol = 'http';
+    }
+
+    return res.send(`You can share your secret with this link (It will only work once):<br/>${protocol}://${req.get('host')}/${token}<br/><br/> The link is only guaranteed for 30 minutes.<br/><br/><a href="/">Go home</a>`);
   });
 };
 

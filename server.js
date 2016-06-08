@@ -47,10 +47,12 @@ if(env === 'development') {
   app.use(morgan('dev'));
 }
 
+// Before filter for all requests
+app.all('*', mainController.beforeFilter);
+
+// Routes
 app.get('/', mainController.index);
-
 app.post('/new', mainController.create);
-
 app.get('*', mainController.show);
 
 let port;

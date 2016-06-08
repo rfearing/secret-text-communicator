@@ -3,6 +3,7 @@ let path   = require('path');
 let crypto = require('crypto');
 
 let passwords = {};
+let limits    = {};
 let key = String(Math.random()); // used for encryption and decryption
 
 function encrypt(text){
@@ -19,6 +20,19 @@ function decrypt(text){
   return dec;
 }
 
+module.exports.beforeFilter = (req, res, next) => {
+  // Remove all keys that have expired.
+  for(let key in passwords){
+    // If the limit was a date in the past, expire it.
+    if(limits[key] < Date.now()) {
+      passwords[key] = undefined;
+    }
+  }
+
+  //ENGAGE!
+  next();
+};
+
 module.exports.index = (req, res) => {
   res.sendFile(path.join(__dirname+'/index.html'));
 };
@@ -27,6 +41,7 @@ module.exports.create = (req, res) => {
   return crypto.randomBytes(48, (err, buffer) => {
     let token = buffer.toString('hex');
     passwords[token] = encrypt(req.body.message);
+    limits[token] = Date.now() + (24*60*60*1000); // Expires in 7 days
 
     let protocol;
     if(process.env.NODE_ENV === 'production') {

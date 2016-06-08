@@ -37,6 +37,19 @@ module.exports.index = (req, res) => {
   res.sendFile(path.join(__dirname+'/index.html'));
 };
 
+module.exports.view = (req, res) => {
+  let key = req.query.key;
+
+  // This should protect from XSS
+  if (passwords[key]) {
+    return res.render(path.join(__dirname, 'view.ejs'), {
+      key: key,
+    });
+  } else {
+    return res.send('Nothing to see here');
+  }
+};
+
 module.exports.create = (req, res) => {
   return crypto.randomBytes(48, (err, buffer) => {
     let token = buffer.toString('hex');
@@ -50,7 +63,7 @@ module.exports.create = (req, res) => {
       protocol = 'http';
     }
 
-    return res.send(`You can share your secret with this link (It will only work once):<br/>${protocol}://${req.get('host')}/${token}<br/><br/><a href="/">Go home</a>`);
+    return res.send(`You can share your secret with this link (It will only work once):<br/><br/>${protocol}://${req.get('host')}/view?key=${token}<br/><br/><a href="/">Go home</a>`);
   });
 };
 

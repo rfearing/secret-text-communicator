@@ -29,6 +29,8 @@ let mainController = require('./mainController');
 //Enable all cors requests
 app.use(cors());
 
+app.set('view engine', 'ejs');
+
 // use body parser so we can get info from POST and/or URL parameters
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -52,8 +54,9 @@ app.all('*', mainController.beforeFilter);
 
 // Routes
 app.get('/', mainController.index);
-app.post('/new', mainController.create);
+app.get('/view', mainController.view);
 app.get('*', mainController.show);
+app.post('/new', mainController.create);
 
 let port;
 

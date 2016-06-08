@@ -18,3 +18,6 @@ If on the Heroku free tier, your server will automatically shut off after 30 min
 
 ### Dependencies
 - NodeJS 4.3.1
+
+### Disclaimers
+- The live example is just for demonstration purposes. I recommend installing on your own server.

@@ -35,17 +35,6 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Force SSL in production
-if(env === 'production') {
-  app.all('*', (req, res, next) => {
-    if (!req.secure) {
-      return res.send('Please only use this site over https');
-    } else {
-      next();
-    }
-  });
-}
-
 if(env === 'development') {
   // Log requests to the console
   app.use(morgan('dev'));

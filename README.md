@@ -1,7 +1,7 @@
 # Secret Text Communicator (beta)
 This app is built for sharing passwords or secret text with whoever in a more secure way than email without adding any extra steps for clients.
 
-The link you share can only be lived once. All passwords live encrypted in memory.
+The link you share can only be viewed once. All passwords live encrypted in memory.
 
 All passwords expire in 7 days regardless of where they are hosted.
 

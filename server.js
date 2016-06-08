@@ -1,8 +1,8 @@
 // NEW
 'use strict';
 let fs = require('fs-extra');
-require('express-force-ssl');
 
+let path = require('path');
 let env  = process.env.NODE_ENV;
 // Ensure we're in the project directory, so relative paths work as expected
 // no matter where we actually lift from.
@@ -35,12 +35,14 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Force SSL in production
 if(env === 'production') {
-  app.set('forceSSLOptions', {
-    enable301Redirects: true,
-    trustXFPHeader: false,
-    httpsPort: 443,
-    sslRequiredMessage: 'SSL Required.',
+  app.all('*', (req, res, next) => {
+    if (!req.secure) {
+      return res.send('Please only use this site over https');
+    } else {
+      next();
+    }
   });
 }
 
@@ -55,6 +57,9 @@ app.all('*', mainController.beforeFilter);
 // Routes
 app.get('/', mainController.index);
 app.get('/view', mainController.view);
+app.get('/robots.txt', (req, res) => {
+  res.sendFile(path.join(__dirname+'/robots.txt'));
+});
 app.get('*', mainController.show);
 app.post('/new', mainController.create);
 

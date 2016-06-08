@@ -5,7 +5,7 @@ The link you share can only be lived once. All passwords live encrypted in memor
 
 All passwords expire in 7 days regardless of where they are hosted.
 
-You can see a live example <a href="https://enigmatic-meadow-28475.herokuapp.com/">here</a>
+You can see a live example <a href="https://enigmatic-meadow-28475.herokuapp.com/" target="_blank">here</a>
 
 ###Simple Heroku Deployment
 If on the Heroku free tier, your server will automatically shut off after 30 minutes of inactivity, in effect, stopping the node process and clearing all saved passwords. This is either desirable or undesirable depending on your use-case.

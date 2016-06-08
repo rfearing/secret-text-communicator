@@ -1,0 +1,27 @@
+{
+  "name": "heroku-password-sharer",
+  "version": "0.0.1",
+  "engines": {
+    "node": "4.3.1"
+  },
+  "description": "Allows you to securely share passwords",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "NODE_ENV=development nodemon server.js"
+  },
+  "author": "Chiedo <chiedo@chie.do> (https://chie.do)",
+  "license": "MIT",
+  "dependencies": {
+    "babel": "^6.5.2",
+    "babel-register": "^6.9.0",
+    "body-parser": "^1.14.1",
+    "cors": "^2.7.1",
+    "dotenv": "^1.2.0",
+    "express": "^4.13.4",
+    "fs-extra": "^0.30.0",
+    "mongoose": "^4.2.2",
+    "morgan": "^1.6.1",
+    "nodemon": "^1.9.2"
+  }
+}

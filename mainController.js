@@ -19,7 +19,7 @@ module.exports.create = (req, res) => {
       protocol = 'http';
     }
 
-    return res.send(`You can share your secret with this link (It will only work once):<br/>${protocol}://${req.get('host')}/${token}<br/><br/> The link is only guaranteed for 30 minutes.<br/><br/><a href="/">Go home</a>`);
+    return res.send(`You can share your secret with this link (It will only work once):<br/>${protocol}://${req.get('host')}/${token}<br/><br/><a href="/">Go home</a>`);
   });
 };
 

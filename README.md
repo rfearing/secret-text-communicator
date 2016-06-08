@@ -1,7 +1,7 @@
 # Heroku Password sharer (beta)
 This app is built for sharing passwords or secret content with clients in a more secure way than email without adding any extra steps for clients.
 
-This is made for the free heroku tier since they automatically shut off after 30 minutes of inactivity, in effect, stopping the node process and clearing all saved passwords.
+If on the Heroku free tier, your server will automatically shut off after 30 minutes of inactivity, in effect, stopping the node process and clearing all saved passwords. This is either desirable or undesirable depending on your use-case.
 
 Obviously you should use SSL.
 

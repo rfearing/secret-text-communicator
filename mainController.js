@@ -77,7 +77,9 @@ module.exports.show = (req, res) => {
   if(passwords[key]) {
     x = decrypt(passwords[key]);
     passwords[key] = undefined;
+    return res.send(`${x}`);
+  } else {
+    return res.send('Nothing to see here');
   }
 
-  return res.send(`${x}`);
 };

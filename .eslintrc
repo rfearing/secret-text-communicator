@@ -36,7 +36,6 @@
     "semi": [1, "always"],
     "eqeqeq": 2,
     "curly": 2,
-    "require-jsdoc": 1,
     "valid-jsdoc": [1, {
       "requireParamDescription": false,
       "requireReturnDescription": false,

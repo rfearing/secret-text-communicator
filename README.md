@@ -6,7 +6,7 @@ This is made for the free heroku tier since they automatically shut off after 30
 Obviously you should use SSL.
 
 ###Getting started
-3. Deploy to heroku.
+3. Deploy to heroku and create a `NODE_ENV` environment variable set to `production`
 4. Visit your app at the Heroku URL.
 
 ### Development

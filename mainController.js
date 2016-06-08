@@ -13,7 +13,7 @@ module.exports.create = (req, res) => {
     passwords[token] = req.body.message;
 
     let protocol;
-    if(req.connection.encrypted) {
+    if(process.env.NODE_ENV='production') {
       protocol = 'https';
     } else {
       protocol = 'http';

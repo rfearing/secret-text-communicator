@@ -1,11 +1,11 @@
 'use strict';
 let path   = require('path');
 let crypto = require('crypto');
-let rand = require('csprng');
+let nacl = require('ecma-nacl');
+let key = new Buffer(crypto.randomBytes(32));
 
 let passwords = {};
 let limits    = {};
-let algorithm = 'aes256';
 
 module.exports.beforeFilter = (req, res, next) => {
   // Remove all keys that have expired.
@@ -29,14 +29,14 @@ module.exports.index = (req, res) => {
 // the secret and burning it.
 module.exports.view = (req, res) => {
   let token = req.query.token;
-  let key = req.query.key;
+  let nonce = req.query.nonce;
 
   // Check if the URL exists first to prevent annoying UX
   if (passwords[token]) {
     //EJS should prevent XSS
     return res.render(path.join(__dirname, 'view.ejs'), {
       token: token,
-      key: key,
+      nonce: nonce,
     });
   } else {
     return res.send('Nothing to see here');
@@ -44,30 +44,28 @@ module.exports.view = (req, res) => {
 };
 
 module.exports.create = (req, res) => {
-  return crypto.randomBytes(48, (err, buffer) => {
-    // Save the random token
-    let token = buffer.toString('hex');
+  // Save the random token
+  let token = crypto.randomBytes(48).toString('hex');
 
-    // Create a random key
-    let key = rand(160, 36);
+  // Create a random nonce
+  let nonce = new Buffer(crypto.randomBytes(24));
 
-    // Create a new cypher just for this request
-    let cipher = crypto.createCipher(algorithm, key);
+  // Message as Buffer
+  let message = new Buffer(req.body.message, 'utf-8');
 
-    // Store the encrypted password in the array and the expiry time
-    passwords[token] = Buffer.concat([cipher.update(req.body.message),cipher.final()]);
-    limits[token] = Date.now() + (24*60*60*1000); // Expires in 7 days
-    // Determine which protocol to use for the link
-    let protocol;
-    if(process.env.NODE_ENV === 'production') {
-      protocol = 'https';
-    } else {
-      protocol = 'http';
-    }
+  // Store the encrypted password in the array and the expiry time
+  passwords[token] = nacl.secret_box.pack(message, nonce, key);
+  limits[token] = Date.now() + (24*60*60*1000); // Expires in 7 days
+  // Determine which protocol to use for the link
+  let protocol;
+  if(process.env.NODE_ENV === 'production') {
+    protocol = 'https';
+  } else {
+    protocol = 'http';
+  }
 
-    // Dirty.. I know
-    return res.send(`You can share your secret with this link (It will only work once):<br/><br/>${protocol}://${req.get('host')}/view?token=${token}&key=${key}<br/><br/><a href="/">Go home</a>`);
-  });
+  // Dirty.. I know
+  return res.send(`You can share your secret with this link (It will only work once):<br/><br/>${protocol}://${req.get('host')}/view?token=${token}&nonce=${nonce}<br/><br/><a href="/">Go home</a>`);
 };
 
 module.exports.show = (req, res) => {
@@ -76,12 +74,11 @@ module.exports.show = (req, res) => {
 
   // Lazy way to get just the token part of the URL
   let token = req.originalUrl.replace('/','').split('?')[0];
-  let key = req.query.key;
+  let nonce = req.query.nonce;
 
   if(passwords[token]) {
-    // Decrypt the password using the key from the URL
-    let decipher = crypto.createDecipher(algorithm, key);
-    let x = Buffer.concat([decipher.update(passwords[token]) , decipher.final()]);
+    // Decrypt the password using the nonce from the URL
+    let x = nacl.secret_box.open(passwords[token], new Buffer(nonce), key);
 
     // Clear the entry
     passwords[token] = undefined;

@@ -48,7 +48,7 @@ module.exports.create = (req, res) => {
   let token = crypto.randomBytes(48).toString('hex');
 
   // Create a random nonce
-  let nonceString = crypto.randomBytes(24);
+  let nonceString = crypto.randomBytes(24).toString('hex').substring(0,24);
   let nonce = new Buffer(nonceString);
 
   // Message as Buffer
@@ -80,6 +80,9 @@ module.exports.show = (req, res) => {
   if(passwords[token]) {
     // Decrypt the password using the nonce from the URL
     let x = nacl.secret_box.open(passwords[token], new Buffer(nonce), key);
+
+    // Now just need to convert buffer back to string here
+    // x = ?
 
     // Clear the entry
     passwords[token] = undefined;

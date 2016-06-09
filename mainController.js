@@ -81,8 +81,8 @@ module.exports.show = (req, res) => {
     // Decrypt the password using the nonce from the URL
     let x = nacl.secret_box.open(passwords[token], new Buffer(nonce), key);
 
-    // Now just need to convert buffer back to string here
-    // x = ?
+    // Now just need to convert buffer back to string here. This may be glitchy
+    x = decodeURIComponent(escape(String.fromCharCode.apply(null, x)));
 
     // Clear the entry
     passwords[token] = undefined;

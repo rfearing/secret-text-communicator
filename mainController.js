@@ -4,28 +4,14 @@ let crypto = require('crypto');
 
 let passwords = {};
 let limits    = {};
-let key = String(Math.random()); // used for encryption and decryption
-
-function encrypt(text){
-  let cipher = crypto.createCipher('aes-256-cbc',key);
-  let crypted = cipher.update(text,'utf8','hex');
-  crypted += cipher.final('hex');
-  return crypted;
-}
-
-function decrypt(text){
-  let decipher = crypto.createDecipher('aes-256-cbc',key);
-  let dec = decipher.update(text,'hex','utf8');
-  dec += decipher.final('utf8');
-  return dec;
-}
+let algorithm = 'aes256';
 
 module.exports.beforeFilter = (req, res, next) => {
   // Remove all keys that have expired.
-  for(let key in passwords){
+  for(let token in passwords){
     // If the limit was a date in the past, expire it.
-    if(limits[key] < Date.now()) {
-      passwords[key] = undefined;
+    if(limits[token] < Date.now()) {
+      passwords[token] = undefined;
     }
   }
 
@@ -37,12 +23,18 @@ module.exports.index = (req, res) => {
   res.sendFile(path.join(__dirname+'/index.html'));
 };
 
+// Renders an intermediary page for viewing the secret.
+// This is to prevent software like slack from pre-loading
+// the secret and burning it.
 module.exports.view = (req, res) => {
+  let token = req.query.token;
   let key = req.query.key;
 
-  // This should protect from XSS
-  if (passwords[key]) {
+  // Check if the URL exists first to prevent annoying UX
+  if (passwords[token]) {
+    //EJS should prevent XSS
     return res.render(path.join(__dirname, 'view.ejs'), {
+      token: token,
       key: key,
     });
   } else {
@@ -52,10 +44,19 @@ module.exports.view = (req, res) => {
 
 module.exports.create = (req, res) => {
   return crypto.randomBytes(48, (err, buffer) => {
+    // Save the random token
     let token = buffer.toString('hex');
-    passwords[token] = encrypt(req.body.message);
-    limits[token] = Date.now() + (24*60*60*1000); // Expires in 7 days
 
+    // Create a random key
+    let key = String(Math.random());
+
+    // Create a new cypher just for this request
+    let cipher = crypto.createCipher(algorithm, key);
+
+    // Store the encrypted password in the array and the expiry time
+    passwords[token] = Buffer.concat([cipher.update(req.body.message),cipher.final()]);
+    limits[token] = Date.now() + (24*60*60*1000); // Expires in 7 days
+    // Determine which protocol to use for the link
     let protocol;
     if(process.env.NODE_ENV === 'production') {
       protocol = 'https';
@@ -63,7 +64,8 @@ module.exports.create = (req, res) => {
       protocol = 'http';
     }
 
-    return res.send(`You can share your secret with this link (It will only work once):<br/><br/>${protocol}://${req.get('host')}/view?key=${token}<br/><br/><a href="/">Go home</a>`);
+    // Dirty.. I know
+    return res.send(`You can share your secret with this link (It will only work once):<br/><br/>${protocol}://${req.get('host')}/view?token=${token}&key=${key}<br/><br/><a href="/">Go home</a>`);
   });
 };
 
@@ -71,12 +73,17 @@ module.exports.show = (req, res) => {
   // Prevent script injection
   res.setHeader('content-type', 'text/plain');
 
-  let key = req.originalUrl.replace('/','');
-  let x;
+  // Lazy way to get just the token part of the URL
+  let token = req.originalUrl.replace('/','').split('?')[0];
+  let key = req.query.key;
 
-  if(passwords[key]) {
-    x = decrypt(passwords[key]);
-    passwords[key] = undefined;
+  if(passwords[token]) {
+    // Decrypt the password using the key from the URL
+    let decipher = crypto.createDecipher(algorithm, key);
+    let x = Buffer.concat([decipher.update(passwords[token]) , decipher.final()]);
+
+    // Clear the entry
+    passwords[token] = undefined;
     return res.send(`${x}`);
   } else {
     return res.send('Nothing to see here');

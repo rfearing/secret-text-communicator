@@ -1,6 +1,7 @@
 'use strict';
 let path   = require('path');
 let crypto = require('crypto');
+let rand = require('csprng');
 
 let passwords = {};
 let limits    = {};
@@ -48,7 +49,7 @@ module.exports.create = (req, res) => {
     let token = buffer.toString('hex');
 
     // Create a random key
-    let key = String(Math.random());
+    let key = rand(160, 36);
 
     // Create a new cypher just for this request
     let cipher = crypto.createCipher(algorithm, key);

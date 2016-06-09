@@ -48,7 +48,8 @@ module.exports.create = (req, res) => {
   let token = crypto.randomBytes(48).toString('hex');
 
   // Create a random nonce
-  let nonce = new Buffer(crypto.randomBytes(24));
+  let nonceString = crypto.randomBytes(24);
+  let nonce = new Buffer(nonceString);
 
   // Message as Buffer
   let message = new Buffer(req.body.message, 'utf-8');
@@ -65,7 +66,7 @@ module.exports.create = (req, res) => {
   }
 
   // Dirty.. I know
-  return res.send(`You can share your secret with this link (It will only work once):<br/><br/>${protocol}://${req.get('host')}/view?token=${token}&nonce=${nonce}<br/><br/><a href="/">Go home</a>`);
+  return res.send(`You can share your secret with this link (It will only work once):<br/><br/>${protocol}://${req.get('host')}/view?token=${token}&nonce=${nonceString}<br/><br/><a href="/">Go home</a>`);
 };
 
 module.exports.show = (req, res) => {

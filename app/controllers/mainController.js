@@ -21,7 +21,7 @@ module.exports.beforeFilter = (req, res, next) => {
 };
 
 module.exports.index = (req, res) => {
-  res.sendFile(path.join(__dirname+'/index.html'));
+  return res.render(path.join(__dirname, '../views/pages/index.ejs'), {});
 };
 
 // Renders an intermediary page for viewing the secret.
@@ -34,7 +34,7 @@ module.exports.view = (req, res) => {
   // Check if the URL exists first to prevent annoying UX
   if (passwords[token]) {
     //EJS should prevent XSS
-    return res.render(path.join(__dirname, 'view.ejs'), {
+    return res.render(path.join(__dirname, '../views/pages/view.ejs'), {
       token: token,
       nonce: nonce,
     });
@@ -65,14 +65,15 @@ module.exports.create = (req, res) => {
     protocol = 'http';
   }
 
-  // Dirty.. I know
-  return res.send(`You can share your secret with this link (It will only work once):<br/><br/>${protocol}://${req.get('host')}/view?token=${token}&nonce=${nonceString}<br/><br/><a href="/">Go home</a>`);
+  return res.render(path.join(__dirname, '../views/pages/create.ejs'), {
+    token: token,
+    protocol: protocol,
+    host:req.get('host'),
+    nonce: nonceString,
+  });
 };
 
 module.exports.show = (req, res) => {
-  // Prevent script injection
-  res.setHeader('content-type', 'text/plain');
-
   // Lazy way to get just the token part of the URL
   let token = req.originalUrl.replace('/','').split('?')[0];
   let nonce = req.query.nonce;
@@ -86,7 +87,7 @@ module.exports.show = (req, res) => {
 
     // Clear the entry
     passwords[token] = undefined;
-    return res.send(`${x}`);
+    return res.render(path.join(__dirname, '../views/pages/show.ejs'), {secret: x});
   } else {
     return res.send('Nothing to see here');
   }

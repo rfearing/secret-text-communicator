@@ -24,7 +24,7 @@ let app           = express();
 let bodyParser    = require('body-parser');
 let morgan        = require('morgan');
 let cors          = require('cors');
-let mainController = require('./mainController');
+let mainController = require('./app/controllers/mainController');
 
 //Enable all cors requests
 app.use(cors());
@@ -47,7 +47,7 @@ app.all('*', mainController.beforeFilter);
 app.get('/', mainController.index);
 app.get('/view', mainController.view);
 app.get('/robots.txt', (req, res) => {
-  res.sendFile(path.join(__dirname+'/robots.txt'));
+  res.sendFile(path.join(__dirname,'static','robots.txt'));
 });
 app.get('*', mainController.show);
 app.post('/new', mainController.create);

@@ -1,5 +1,5 @@
 # Secret Text Communicator (beta)
-This app is built for sharing passwords or secret text with whoever in a more secure way than email without adding any extra steps for clients.
+This app is built for sharing passwords or secret text with whoever in a more secure way than email without adding complex extra steps or account creations.
 
 The link you share can only be viewed once. All passwords live encrypted in memory.
 
@@ -13,8 +13,12 @@ If on the Heroku free tier, your server will automatically shut off after 30 min
 1. Deploy to heroku and create a `NODE_ENV` environment variable set to `production`
 1. Visit your app at the Heroku URL.
 
+###Standard Deployment
+1. Use Google. lol.
+
 ### Development
-- Self explanitory
+- Run `npm install`
+- Run `npm start`
 
 ### Dependencies
 - NodeJS 4.3.1

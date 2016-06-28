@@ -3,6 +3,7 @@ let path   = require('path');
 let crypto = require('crypto');
 let nacl = require('ecma-nacl');
 let key = new Buffer(crypto.randomBytes(32));
+let fs = require('fs');
 
 let passwords = {};
 let limits    = {};
@@ -65,11 +66,17 @@ module.exports.create = (req, res) => {
     protocol = 'http';
   }
 
-  return res.render(path.join(__dirname, '../views/pages/create.ejs'), {
-    token: token,
-    protocol: protocol,
-    host:req.get('host'),
-    nonce: nonceString,
+  return fs.writeFile('./number-of-passwords.txt', Object.keys(passwords).length, (err) => {
+    if(err) {
+      return console.log(err);
+    }
+
+    return res.render(path.join(__dirname, '../views/pages/create.ejs'), {
+      token: token,
+      protocol: protocol,
+      host:req.get('host'),
+      nonce: nonceString,
+    });
   });
 };
 
@@ -86,8 +93,16 @@ module.exports.show = (req, res) => {
     x = decodeURIComponent(escape(String.fromCharCode.apply(null, x)));
 
     // Clear the entry
-    passwords[token] = undefined;
-    return res.render(path.join(__dirname, '../views/pages/show.ejs'), {secret: x});
+    delete passwords[token];
+    delete limits[token];
+
+    return fs.writeFile('./number-of-passwords.txt', Object.keys(passwords).length, (err) => {
+      if(err) {
+        return console.log(err);
+      }
+
+      return res.render(path.join(__dirname, '../views/pages/show.ejs'), {secret: x});
+    });
   } else {
     return res.send('Nothing to see here');
   }

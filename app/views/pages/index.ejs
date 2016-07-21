@@ -1,6 +1,10 @@
 <% include ../partials/header %>
   <form action="/new" method="post">
-    <textarea name="message" style='width: 50%; min-height: 200px;'></textarea>
+    <label for="message">
+      You will be provided with a link to the content you enter. <br />
+      The link will only be active for one visit.
+    </label>
+    <textarea name="message" style='width: 100%; max-width: 500px; min-height: 200px;'></textarea>
     <br/>
     <input type="submit" value="Save" />
   </form>
